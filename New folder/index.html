@@ -1,0 +1,627 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery Site — Demo with Backend Upload</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    nav {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    nav a {
+      color: #555;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover {
+      color: #007bff;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+      color: #fff;
+      padding: 60px 20px 40px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 4vw, 4rem);
+      margin-bottom: 16px;
+      line-height: 1.05;
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: 0 auto 24px;
+      font-size: 1.05rem;
+      color: #e8f1ff;
+    }
+
+    .hero small {
+      display: block;
+      color: #d6e9ff;
+      margin-top: 12px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section h2 {
+      font-size: 2rem;
+      margin-bottom: 14px;
+      color: #1a1a1a;
+    }
+
+    .section p {
+      max-width: 850px;
+      margin-bottom: 18px;
+      color: #555;
+    }
+
+    .section ul {
+      margin: 0 0 18px 20px;
+      color: #555;
+    }
+
+    .section ul li {
+      margin-bottom: 10px;
+    }
+
+    .upload-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .upload-panel input[type=file] {
+      flex: 1 1 240px;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .upload-panel button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #007bff;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .auth-panel {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e4e7ec;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .auth-tabs button {
+      padding: 10px 16px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fff;
+      color: #444;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .auth-tabs button.active {
+      background: #007bff;
+      border-color: #007bff;
+      color: #fff;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .auth-form input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .auth-form button {
+      width: 160px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .upload-panel button:hover {
+      background: #0056cc;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 18px 32px rgba(15, 23, 42, 0.06);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 180px;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 22px 40px rgba(15, 23, 42, 0.12);
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      object-fit: cover;
+      max-height: 180px;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #222;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: #777;
+      font-size: 0.95rem;
+      flex-wrap: wrap;
+    }
+
+    .load-more {
+      text-align: center;
+      padding: 25px;
+      color: #666;
+      font-size: 18px;
+    }
+
+    .notice {
+      padding: 14px 18px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #e4e7ec;
+      max-width: 800px;
+      margin-bottom: 24px;
+      color: #444;
+    }
+
+    .footer {
+      padding: 30px 20px 40px;
+      text-align: center;
+      background: #fff;
+      border-top: 1px solid #eee;
+      color: #666;
+    }
+
+    .footer small {
+      display: block;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 740px) {
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="top-bar">
+      <div class="brand">Gallery Site</div>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#gallery-section">Gallery</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="terms.html">Terms</a>
+        <a href="privacy.html">Privacy</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container">
+        <h1>Publish your visual stories with a clean gallery layout</h1>
+        <p>This page is built as a complete gallery landing page with sections for About, Contact, and Privacy Policy.</p>
+        <small>Sign in to access account-based site features.</small>
+      </div>
+    </section>
+
+    <div class="container">
+      <section class="section" id="gallery-section">
+        <h2>Gallery</h2>
+        <p>Browse visual posts in the gallery below. Sign in to access your account settings.</p>
+
+        <div class="auth-panel" id="authPanel">
+          <div class="auth-tabs">
+            <button id="showRegisterBtn" class="active" type="button">Register</button>
+            <button id="showLoginBtn" type="button">Login</button>
+          </div>
+
+          <form id="registerForm" class="auth-form">
+            <input type="email" id="registerEmail" placeholder="Email" value="vlmyvlmyt953@gmail.com" required>
+            <input type="password" id="registerPassword" placeholder="Password" required>
+            <button type="button" id="registerButton">Create Account</button>
+            <p style="font-size:0.95rem;color:#555;">Use your email to create an account. Authorized users can manage the site.</p>
+          </form>
+
+          <form id="loginForm" class="auth-form hidden">
+            <input type="email" id="loginEmail" placeholder="Email" required>
+            <input type="password" id="loginPassword" placeholder="Password" required>
+            <button type="button" id="loginButton">Login</button>
+          </form>
+
+          <button id="logoutButton" type="button" class="hidden" style="max-width:160px;">Logout</button>
+
+          <div id="authNotice" class="notice">Register or log in to access your account and manage site features.</div>
+        </div>
+
+        <div id="uploadMessage" class="notice">
+          Sign in to use your account features. If the backend server is running, uploads are stored on the server.
+        </div>
+
+        <div id="uploadControls" class="hidden">
+          <div class="upload-panel">
+            <input type="file" id="uploadInput" accept="image/*" multiple>
+            <button id="uploadButton" type="button">Upload Images</button>
+          </div>
+          <div class="notice">
+            Note: This page supports both local preview and backend storage. If the server is not running, images will still appear locally.
+          </div>
+        </div>
+
+        <div class="gallery" id="gallery"></div>
+        <div class="load-more">Scroll down to load more gallery items.</div>
+      </section>
+
+      <section class="section" id="about">
+        <h2>About this Site</h2>
+        <p>This gallery site is designed to host image-based content in a modern layout. It includes a navigation structure, hero section, gallery cards, and sections for additional site information.</p>
+        <p>The current design is meant to be easy to expand later with real content, backend upload handling, or a publishing workflow for AdSense readiness.</p>
+      </section>
+
+      <section class="section" id="contact">
+        <h2>Contact</h2>
+        <p>If you want to collect viewer feedback or admin requests, add your contact details here. For now, this page includes a placeholder contact email address.</p>
+        <p>Email: <a href="mailto:vlmyt953@gmail.com">vlmyt953@gmail.com</a></p>
+      </section>
+
+      <section class="section" id="compliance">
+        <h2>Compliance and Deployment</h2>
+        <p>This project now includes dedicated policy pages, backend upload storage, and deployment guidance for a real live site.</p>
+        <ul>
+          <li><a href="privacy.html">Privacy Policy page</a></li>
+          <li><a href="terms.html">Terms of Use page</a></li>
+          <li>Backend upload endpoint at <code>/upload</code></li>
+          <li>Server storage served from <code>/uploads</code></li>
+        </ul>
+        <p>To publish on a live domain, host this application and update the sitemap/robots files with your actual site URL.</p>
+      </section>
+
+      <section class="section" id="privacy">
+        <h2>Privacy Policy</h2>
+        <p>This demo site does not collect personal data. Image uploads are handled locally in the browser and are not stored on a server in the current version.</p>
+        <p>For a production site, you should add a detailed privacy policy, terms of use, and server-side upload storage before publishing.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div>Built as a simple gallery landing page with upload support for admin preview.</div>
+    <small>Last updated: 2026</small>
+  </footer>
+
+  <script>
+    const gallery = document.getElementById('gallery');
+    const uploadInput = document.getElementById('uploadInput');
+    const uploadButton = document.getElementById('uploadButton');
+    const uploadMessage = document.getElementById('uploadMessage');
+    let count = 0;
+
+    function createCard(title, imageSrc = null) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.title = title.toLowerCase();
+      card.innerHTML = `
+        ${imageSrc ? `<img src="${imageSrc}" alt="${title}">` : ''}
+        <div class="card-title">${title}</div>
+        <div class="stats">
+          <span>👁 ${Math.floor(Math.random() * 100)}K</span>
+          <span>👍 ${70 + Math.floor(Math.random() * 30)}%</span>
+        </div>
+      `;
+      gallery.appendChild(card);
+    }
+
+    function addCards(amount = 12) {
+      for (let i = 0; i < amount; i += 1) {
+        count += 1;
+        createCard(`Gallery Item #${count}`);
+      }
+    }
+
+    async function loadServerImages() {
+      try {
+        const response = await fetch('/uploads/list');
+        if (!response.ok) return;
+        const result = await response.json();
+        if (!Array.isArray(result.uploaded)) return;
+        result.uploaded.forEach((url) => {
+          count += 1;
+          createCard(`Server Image #${count}`, url);
+        });
+        uploadMessage.textContent = 'Loaded existing uploaded images from server storage.';
+      } catch (error) {
+        uploadMessage.textContent = 'Backend server not available; uploads will preview locally.';
+      }
+    }
+
+    const adminEmail = 'vlmyvlmyt953@gmail.com';
+    const USERS_STORAGE_KEY = 'gallerySiteUsers';
+    const SESSION_STORAGE_KEY = 'gallerySiteSession';
+    const authNotice = document.getElementById('authNotice');
+    const authPanel = document.getElementById('authPanel');
+    const registerForm = document.getElementById('registerForm');
+    const loginForm = document.getElementById('loginForm');
+    const showRegisterBtn = document.getElementById('showRegisterBtn');
+    const showLoginBtn = document.getElementById('showLoginBtn');
+    const registerButton = document.getElementById('registerButton');
+    const loginButton = document.getElementById('loginButton');
+    const logoutButton = document.getElementById('logoutButton');
+    const uploadControls = document.getElementById('uploadControls');
+
+    function getUsers() {
+      return JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+    }
+
+    function setUsers(users) {
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+    }
+
+    function getSession() {
+      return JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY) || 'null');
+    }
+
+    function setSession(user) {
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
+    }
+
+    function clearSession() {
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
+    }
+
+    function showForm(form) {
+      registerForm.classList.toggle('hidden', form !== 'register');
+      loginForm.classList.toggle('hidden', form !== 'login');
+      showRegisterBtn.classList.toggle('active', form === 'register');
+      showLoginBtn.classList.toggle('active', form === 'login');
+    }
+
+    function updateAuthUI() {
+      const user = getSession();
+      if (!user) {
+        uploadControls.classList.add('hidden');
+        logoutButton.classList.add('hidden');
+        authNotice.textContent = 'Register or log in to access upload functionality. Only the admin account can upload images.';
+        return;
+      }
+
+      authNotice.textContent = `Logged in as ${user.email}. ${user.admin ? 'Admin access granted.' : 'Upload access restricted to admin only.'}`;
+      logoutButton.classList.remove('hidden');
+      if (user.admin) {
+        uploadControls.classList.remove('hidden');
+      } else {
+        uploadControls.classList.add('hidden');
+      }
+    }
+
+    function createAccount(email, password) {
+      const users = getUsers();
+      if (users.some((item) => item.email === email)) {
+        authNotice.textContent = 'This email is already registered. Please log in instead.';
+        return;
+      }
+
+      const newUser = {
+        email,
+        password,
+        admin: email.toLowerCase() === adminEmail.toLowerCase(),
+      };
+      users.push(newUser);
+      setUsers(users);
+      setSession({ email: newUser.email, admin: newUser.admin });
+      authNotice.textContent = newUser.admin ? 'Admin account created. You can now upload images.' : 'Account created successfully. Only admin can upload images.';
+      updateAuthUI();
+    }
+
+    function loginAccount(email, password) {
+      const users = getUsers();
+      const user = users.find((item) => item.email === email && item.password === password);
+      if (!user) {
+        authNotice.textContent = 'Login failed. Check your email and password.';
+        return;
+      }
+      setSession({ email: user.email, admin: user.admin });
+      authNotice.textContent = user.admin ? 'Admin logged in. Upload enabled.' : 'Logged in successfully. Upload is only available to admin.';
+      updateAuthUI();
+    }
+
+    function logoutAccount() {
+      clearSession();
+      authNotice.textContent = 'You have been logged out. Register or log in to continue.';
+      updateAuthUI();
+    }
+
+    showRegisterBtn.addEventListener('click', () => showForm('register'));
+    showLoginBtn.addEventListener('click', () => showForm('login'));
+    registerButton.addEventListener('click', () => {
+      const email = document.getElementById('registerEmail').value.trim();
+      const password = document.getElementById('registerPassword').value.trim();
+      if (!email || !password) {
+        authNotice.textContent = 'Please enter both email and password to register.';
+        return;
+      }
+      createAccount(email, password);
+    });
+    loginButton.addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      if (!email || !password) {
+        authNotice.textContent = 'Please enter both email and password to log in.';
+        return;
+      }
+      loginAccount(email, password);
+    });
+    logoutButton.addEventListener('click', logoutAccount);
+
+    uploadButton.addEventListener('click', async () => {
+      const currentUser = getSession();
+      if (!currentUser || !currentUser.admin) {
+        uploadMessage.textContent = 'Only the admin account can upload images.';
+        return;
+      }
+
+      const files = Array.from(uploadInput.files || []);
+      if (files.length === 0) {
+        uploadMessage.textContent = 'Please select one or more images first.';
+        return;
+      }
+
+      uploadMessage.textContent = 'Uploading images...';
+      const previews = await Promise.all(files.map((file) => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ file, src: reader.result });
+        reader.readAsDataURL(file);
+      })));
+
+      previews.forEach(({ src }) => {
+        count += 1;
+        createCard(`Uploaded Image #${count}`, src);
+      });
+
+      const formData = new FormData();
+      files.forEach((file) => formData.append('images', file));
+
+      try {
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) throw new Error('Upload failed');
+        const result = await response.json();
+        if (result.success) {
+          uploadMessage.textContent = 'Images uploaded to backend storage successfully.';
+        } else {
+          uploadMessage.textContent = 'Preview added locally. Backend did not confirm upload.';
+        }
+      } catch (error) {
+        uploadMessage.textContent = 'Local preview shown. Backend server is not running or upload failed.';
+      }
+
+      uploadInput.value = '';
+    });
+
+    window.addEventListener('scroll', () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 280) {
+        addCards(6);
+      }
+    });
+
+    updateAuthUI();
+    loadServerImages();
+    addCards();
+  </script>
+</body>
+</html>
+```
