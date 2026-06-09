@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact - Photo Gallery</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#0f172a;color:#fff;line-height:1.6;padding:20px;}
+header,footer{max-width:1100px;margin:auto;padding:20px;}
+nav{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+nav a{color:#38bdf8;text-decoration:none;}
+.main{max-width:800px;margin:20px auto;}
+.section{background:#111827;padding:24px;border-radius:12px;margin-bottom:20px;}
+.section h1,h2{margin-bottom:16px;}
+.section p{margin-bottom:12px;color:#cbd5e1;}
+form{display:grid;gap:16px;}
+input,textarea{width:100%;padding:12px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:#fff;}
+button{padding:14px 18px;border:none;border-radius:8px;background:#38bdf8;color:#111827;font-weight:bold;cursor:pointer;}
+button:hover{background:#22c55e;}
+</style>
+</head>
+<body>
+<header>
+    <div class="logo">Photo Gallery</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+    </nav>
+</header>
+<main class="main">
+    <section class="section">
+        <h1>Contact Us</h1>
+        <p>If you have questions about the gallery, licensing, or how this
+        site works with ad programs, please send a message below.</p>
+    </section>
+    <section class="section">
+        <h2>Send a Message</h2>
+        <form action="#" method="post">
+            <input type="text" name="name" placeholder="Your name" required>
+            <input type="email" name="email" placeholder="Your email" required>
+            <textarea name="message" rows="6" placeholder="Your message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </section>
+    <section class="section">
+        <h2>Alternative Contact</h2>
+        <p>Email: <a href="mailto:info@example.com">info@example.com</a></p>
+        <p>Please note this is a static demo site; the form will not send
+        messages without a backend service.</p>
+    </section>
+</main>
+<footer>
+    <p>© 2026 Photo Gallery. All Rights Reserved.</p>
+</footer>
+</body>
+</html>
